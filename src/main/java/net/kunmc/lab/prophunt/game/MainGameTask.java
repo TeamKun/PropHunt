@@ -1,11 +1,13 @@
 package net.kunmc.lab.prophunt.game;
 
+import net.kunmc.lab.prophunt.Kei;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +15,13 @@ import java.util.UUID;
 
 public class MainGameTask extends BukkitRunnable {
 
+    private HunterSelector selector;
     int time = Integer.MAX_VALUE;
     int waittime = Integer.MAX_VALUE;
     int waittimemax = Integer.MAX_VALUE;
+    int cache = 0;
+    Team team_hunter;
+    Team team_seeker;
     List<UUID> hunter_player_cache;
     List<UUID> hunter_player;
 
@@ -33,6 +39,11 @@ public class MainGameTask extends BukkitRunnable {
             hunter_player_cache.add(UUID.fromString(str));
         }
         this.hunter_player = new ArrayList<>();
+        this.selector = selector;
+
+        if(selector == HunterSelector.SELECT){
+            hunter_player.addAll(hunter_player_cache);
+        }
 
         this.mainBossbar = Bukkit.createBossBar("Loading", BarColor.WHITE, BarStyle.SOLID);
         mainBossbar.setVisible(true);
@@ -51,6 +62,8 @@ public class MainGameTask extends BukkitRunnable {
                 mainBossbar.setProgress((double) waittime / waittimemax);
                 waittime--;
             }
+        } else if(gameStatus == 1){
+            Kei.bc("鬼がプレイヤーを攻撃できるようになりました。");
         }
     }
 
