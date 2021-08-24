@@ -2,6 +2,8 @@ package net.kunmc.lab.prophunt.game;
 
 import net.kunmc.lab.prophunt.Kei;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -16,21 +18,15 @@ import java.util.UUID;
 public class MainGameTask extends BukkitRunnable {
 
     private HunterSelector selector;
-    int time = Integer.MAX_VALUE;
-    int waittime = Integer.MAX_VALUE;
-    int waittimemax = Integer.MAX_VALUE;
-    int cache = 0;
-    Team team_hunter;
-    Team team_seeker;
-    List<UUID> hunter_player_cache;
-    List<UUID> hunter_player;
+    int time, timemax, waittime, waittimemax, gameStatus, cache;
+    Team team_hunter, team_seeker;
+    List<UUID> hunter_player_cache, hunter_player;
 
-    BossBar mainBossbar;
-
-    int gameStatus;
+    Location hunter_spawn;
 
     public MainGameTask(int time, HunterSelector selector, String hunter_args){
         this.time = time;
+        this.timemax = time;
         this.gameStatus = 0;
         this.waittime = 30; // 始まるまでの時間
         this.waittimemax = 30; // 始まるまでの時間のキャッシュ
@@ -45,33 +41,66 @@ public class MainGameTask extends BukkitRunnable {
             hunter_player.addAll(hunter_player_cache);
         }
 
-        this.mainBossbar = Bukkit.createBossBar("Loading", BarColor.WHITE, BarStyle.SOLID);
-        mainBossbar.setVisible(true);
     }
 
 
 
     @Override
     public void run() {
-        barrefresh();
         if(gameStatus == 0){
+
+            if(hunter_spawn != null) {
+                for(OfflinePlayer p : team_hunter.getPlayers()){
+                    if(p.isOnline()){
+                        ((Player) p).teleport(hunter_spawn);
+                        ((Player) p).addPotionEffect(Kei.infPot.blind);
+                        ((Player) p).addPotionEffect(Kei.infPot.invisible);
+                    }
+                }
+            }
+
             if(waittime <= 0){
                 gameStatus = 1;
             } else {
-                mainBossbar.setTitle("ゲーム開始まであと " + waittime + "秒");
-                mainBossbar.setProgress((double) waittime / waittimemax);
-                waittime--;
+                // TODO: add scoreboard
             }
         } else if(gameStatus == 1){
             Kei.bc("鬼がプレイヤーを攻撃できるようになりました。");
+            for(OfflinePlayer p : team_hunter.getPlayers()){
+                if(p.isOnline()){
+                    ((Player) p).removePotionEffect(Kei.infPot.blind.getType());
+                    ((Player) p).removePotionEffect(Kei.infPot.invisible.getType());
+                }
+            }
+            gameStatus = 2;
+        } else if(gameStatus == 2){
+            List<OfflinePlayer> players = new ArrayList<>();
+            List<OfflinePlayer> hunter = new ArrayList<>();
+            for(OfflinePlayer p : team_seeker.getPlayers()){
+                if(p.isOnline()){
+                    players.add(p);
+                }
+            }
+
+            for(OfflinePlayer p : team_hunter.getPlayers()){
+                if(p.isOnline()){
+                    hunter.add(p);
+                }
+            }
+
+            if(players.isEmpty()){
+                Kei.bc("ハンターが全員を捕まえました。");
+                gameStatus = 3;
+            } else {
+                int alive = players.size();
+                int hunters = hunter.size();
+            }
         }
     }
 
-    void barrefresh(){
+    void Refresh(){
         for (Player p : Bukkit.getOnlinePlayers()) {
-            if(!mainBossbar.getPlayers().contains(p)) {
-                mainBossbar.addPlayer(p);
-            }
+
         }
     }
 }

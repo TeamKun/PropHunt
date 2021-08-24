@@ -50,6 +50,11 @@ public class Kei {
         public static org.bukkit.DyeColor pink = org.bukkit.DyeColor.PINK;
         public static org.bukkit.DyeColor white = org.bukkit.DyeColor.WHITE;
     }
+
+    public static class infPot {
+        public static org.bukkit.potion.PotionEffect invisible = new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, true, true, true);
+        public static org.bukkit.potion.PotionEffect blind = new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 0, true, true, true);
+    }
     /**
      * Ez sender send message
      * @param p target player
