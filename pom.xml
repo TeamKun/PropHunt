@@ -62,7 +62,7 @@
                                     <type>${project.packaging}</type>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>C:\Users\user\Desktop\mc\blocktf\plugins</outputDirectory>
+                            <outputDirectory>C:\mc\blocktf\plugins</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

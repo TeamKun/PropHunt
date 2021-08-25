@@ -9,6 +9,8 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
@@ -17,28 +19,39 @@ import java.util.UUID;
 
 public class MainGameTask extends BukkitRunnable {
 
-    private HunterSelector selector;
     int time, timemax, waittime, waittimemax, gameStatus, cache;
     Team team_hunter, team_seeker;
-    List<UUID> hunter_player_cache, hunter_player;
+
+    String[] teamname = new String[]{
+            "hunter",
+            "seeker"
+    };
 
     Location hunter_spawn;
 
-    public MainGameTask(int time, HunterSelector selector, String hunter_args){
+    public MainGameTask(int time){
         this.time = time;
         this.timemax = time;
         this.gameStatus = 0;
         this.waittime = 30; // 始まるまでの時間
         this.waittimemax = 30; // 始まるまでの時間のキャッシュ
-        this.hunter_player_cache = new ArrayList<>();
-        for(String str : hunter_args.split(":")){
-            hunter_player_cache.add(UUID.fromString(str));
-        }
-        this.hunter_player = new ArrayList<>();
-        this.selector = selector;
 
-        if(selector == HunterSelector.SELECT){
-            hunter_player.addAll(hunter_player_cache);
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        Scoreboard board = manager.getMainScoreboard();
+        for(Team t : board.getTeams()){
+            if(t.getName().equals(teamname[0])) {
+                team_hunter = t;
+            } else if(t.getName().equals(teamname[1])){
+                team_seeker = t;
+            }
+        }
+
+        if(team_hunter != null) {
+            Kei.bc("ハンターチームが存在していません。");
+            this.cancel();
+        } else if(team_seeker != null) {
+            Kei.bc("シーカーチームが存在していません。");
+            this.cancel();
         }
 
     }
@@ -52,7 +65,7 @@ public class MainGameTask extends BukkitRunnable {
             if(hunter_spawn != null) {
                 for(OfflinePlayer p : team_hunter.getPlayers()){
                     if(p.isOnline()){
-                        ((Player) p).teleport(hunter_spawn);
+                        if(hunter_spawn != null) ((Player) p).teleport(hunter_spawn);
                         ((Player) p).addPotionEffect(Kei.infPot.blind);
                         ((Player) p).addPotionEffect(Kei.infPot.invisible);
                     }
