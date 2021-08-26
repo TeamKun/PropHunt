@@ -1,7 +1,9 @@
 package net.kunmc.lab.prophunt.game;
 
 import net.kunmc.lab.prophunt.Kei;
+import net.kunmc.lab.prophunt.ScoreboardUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarColor;
@@ -75,7 +77,13 @@ public class MainGameTask extends BukkitRunnable {
             if(waittime <= 0){
                 gameStatus = 1;
             } else {
-                // TODO: add scoreboard
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    ScoreboardUtil.unrankedSidebarDisplay(p, new String[]{
+                            p.getName(),
+                            ChatColor.GREEN+"",
+                            ""
+                    });
+                }
             }
         } else if(gameStatus == 1){
             Kei.bc("鬼がプレイヤーを攻撃できるようになりました。");
@@ -111,9 +119,13 @@ public class MainGameTask extends BukkitRunnable {
         }
     }
 
-    void Refresh(){
-        for (Player p : Bukkit.getOnlinePlayers()) {
-
+    String getTeam(Player p){
+        for(OfflinePlayer p2 : team_hunter.getPlayers()){
+            if(p2.getUniqueId() == p.getUniqueId()) return "ハンター";
         }
+        for(OfflinePlayer p2 : team_seeker.getPlayers()){
+            if(p2.getUniqueId() == p.getUniqueId()) return "シーカー";
+        }
+        return null;
     }
 }

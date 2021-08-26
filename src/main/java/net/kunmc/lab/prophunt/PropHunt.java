@@ -1,5 +1,6 @@
 package net.kunmc.lab.prophunt;
 
+import net.kunmc.lab.prophunt.game.MainGameTask;
 import net.kunmc.lab.prophunt.listeners.BlockInteractEventListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -38,6 +39,8 @@ public final class PropHunt extends JavaPlugin {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 p.getInventory().addItem(transform_item);
             }
+
+            new MainGameTask(300).runTaskTimer(this, 20, 20);
         }
     }
 
